@@ -46,7 +46,7 @@ class NoteService {
 
   // method to load all notes from the database
   Future<List<Note>> loadNotes() async {
-    final dynamic notes = _myBox.get("notes");
+    final dynamic notes = await _myBox.get("notes");
 
     if (notes != null && notes is List<dynamic>) {
       return notes.cast<Note>().toList();
@@ -67,5 +67,17 @@ class NoteService {
       }
     }
     return notesByCategory;
+  }
+
+  // method to get the notes by it category
+  Future<List<Note>> getNotesByCategoryName(String catergory) async {
+    final dynamic allNotes = await _myBox.get("notes");
+    final List<Note> notes = [];
+    for (final note in allNotes) {
+      if (note.category == catergory) {
+        notes.add(note);
+      }
+    }
+    return notes;
   }
 }

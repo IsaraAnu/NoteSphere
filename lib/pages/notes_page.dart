@@ -5,6 +5,7 @@ import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/constants.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/text_style.dart';
+import 'package:note_sphere/widgets/noted_card.dart';
 
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
@@ -68,7 +69,54 @@ class _NotesPageState extends State<NotesPage> {
       ),
       body: Padding(
         padding: EdgeInsetsGeometry.all(AppConstants.kDefaultPadding),
-        child: Column(children: [Text("Notes", style: AppTextStyles.appTitle)]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Notes", style: AppTextStyles.appTitle),
+            SizedBox(height: 30),
+            allNotes.isEmpty
+                ? SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: Center(
+                      child: Text(
+                        "No notes available. Click the + button to add a new note.",
+                        style: AppTextStyles.appBody,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: AppConstants.kDefaultPadding,
+                      mainAxisSpacing: AppConstants.kDefaultPadding,
+                      childAspectRatio: 6 / 4,
+                    ),
+                    itemCount: notesWithCategory.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          // navigate to the notes by categorypage
+                          AppRouter.router.push(
+                            "/category",
+                            extra: notesWithCategory.keys.elementAt(index),
+                          );
+                        },
+                        child: NotedCard(
+                          notesCategory: notesWithCategory.keys.elementAt(
+                            index,
+                          ),
+                          notesCount: notesWithCategory.values
+                              .elementAt(index)
+                              .length,
+                        ),
+                      );
+                    },
+                  ),
+          ],
+        ),
       ),
     );
   }
