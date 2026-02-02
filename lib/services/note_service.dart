@@ -95,8 +95,8 @@ class NoteService {
   //method to edit a note
   Future<void> updateNote(Note note) async {
     try {
-      final dynamic allNotes = await -_myBox.get("notes");
-      final int index = allNotes.indexWhere((element) => element.id = note.id);
+      final dynamic allNotes = await _myBox.get("notes");
+      final int index = allNotes.indexWhere((element) => element.id == note.id);
 
       allNotes[index] = note;
       await _myBox.put("notes", allNotes);
