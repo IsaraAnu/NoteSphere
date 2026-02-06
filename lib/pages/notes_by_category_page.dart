@@ -90,6 +90,12 @@ class _NotesByCategoryPageState extends State<NotesByCategoryPage> {
                 itemCount: notesList.length,
                 itemBuilder: (context, index) {
                   return NotesCategoryCard(
+                    viewSingleNote: () {
+                      AppRouter.router.push(
+                        "/single-note",
+                        extra: notesList[index],
+                      );
+                    },
                     noteTitle: notesList[index].title,
                     noteContent: notesList[index].content,
                     editNote: () async {
