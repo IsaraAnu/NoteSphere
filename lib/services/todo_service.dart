@@ -47,4 +47,42 @@ class TodoService {
     }
     return [];
   }
+
+  // mark the todo as done
+  Future<void> markAsDone(Todo todo) async {
+    try {
+      final dynamic allTodos = await _myBox.get("todos");
+      final int index = allTodos.indexWhere((element) => element.id == todo.id);
+      allTodos[index] = todo;
+
+      await _myBox.put("todos", allTodos);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // mark the todo as undone
+  Future<void> markAsUnDone(Todo todo) async {
+    try {
+      final dynamic allTodos = await _myBox.get("todos");
+      final int index = allTodos.indexWhere((element) => element.id == todo.id);
+      allTodos[index] = todo;
+
+      await _myBox.put("notes", allTodos);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // method to add a new todo
+  Future<void> addNewTodo(Todo todo) async {
+    try {
+      final dynamic allTodos = await _myBox.get("todos");
+      allTodos.add(todo);
+
+      await _myBox.put("todos", allTodos);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
