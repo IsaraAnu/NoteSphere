@@ -9,7 +9,7 @@ class Todo {
   @HiveField(0)
   final String id;
   @HiveField(1)
-  final String title;
+  String title;
   @HiveField(2)
   final DateTime date;
   @HiveField(3)

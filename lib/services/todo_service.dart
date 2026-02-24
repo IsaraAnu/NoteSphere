@@ -68,7 +68,7 @@ class TodoService {
       final int index = allTodos.indexWhere((element) => element.id == todo.id);
       allTodos[index] = todo;
 
-      await _myBox.put("notes", allTodos);
+      await _myBox.put("todos", allTodos);
     } catch (e) {
       print(e.toString());
     }
@@ -79,6 +79,31 @@ class TodoService {
     try {
       final dynamic allTodos = await _myBox.get("todos");
       allTodos.add(todo);
+
+      await _myBox.put("todos", allTodos);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  //  method to edit a todo
+  Future<void> editTodo(Todo todo) async {
+    try {
+      final dynamic allTodos = await _myBox.get("todos");
+      final int index = allTodos.indexWhere((element) => element.id == todo.id);
+      allTodos[index] = todo;
+
+      await _myBox.put("todos", allTodos);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // method to delete a todo
+  Future<void> deleteTodo(Todo todo) async {
+    try {
+      final dynamic allTodos = await _myBox.get("todos");
+      allTodos.removeWhere((element) => element.id == todo.id);
 
       await _myBox.put("todos", allTodos);
     } catch (e) {
