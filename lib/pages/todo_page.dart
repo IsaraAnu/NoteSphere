@@ -6,6 +6,7 @@ import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/text_style.dart';
 import 'package:note_sphere/widgets/completed_tab.dart';
+import 'package:note_sphere/widgets/todo_inherited_widget.dart';
 import 'package:note_sphere/widgets/todo_tab.dart';
 
 class TodoPage extends StatefulWidget {
@@ -71,6 +72,7 @@ class _TodoPageState extends State<TodoPage>
           time: DateTime.now(),
           isDone: false,
         );
+        _taskController.clear();
         await todoService.addNewTodo(newTodo);
         setState(() {
           inCompletedTodos.add(newTodo);
@@ -78,6 +80,7 @@ class _TodoPageState extends State<TodoPage>
         });
         AppHelpers.showSnackBar(context, "Task added successfully!");
         Navigator.of(context).pop();
+        AppRouter.router.go("/todos");
       }
     } catch (e) {
       print(e.toString());
@@ -143,46 +146,52 @@ class _TodoPageState extends State<TodoPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        bottom: TabBar(
+    return TodoData(
+      todos: allTodos,
+      onTodosChanged: _loadTodos,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(child: Text("ToDo", style: AppTextStyles.appDescription)),
+              Tab(
+                child: Text("Completed", style: AppTextStyles.appDescription),
+              ),
+            ],
+          ),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () {
+              AppRouter.router.go("/");
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            openMessageModel(context);
+          },
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+            side: BorderSide(color: AppColors.kWhiteColor, width: 2),
+          ),
+
+          child: Icon(Icons.add, size: 40, color: AppColors.kWhiteColor),
+        ),
+        body: TabBarView(
           controller: _tabController,
-          tabs: const [
-            Tab(child: Text("ToDo", style: AppTextStyles.appDescription)),
-            Tab(child: Text("Completed", style: AppTextStyles.appDescription)),
+          children: [
+            TodoTab(
+              incompletedTodos: inCompletedTodos,
+              completedTodos: completedTodos,
+            ),
+            CompletedTab(
+              completedTodos: completedTodos,
+              incompletedTodos: inCompletedTodos,
+            ),
           ],
         ),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            AppRouter.router.go("/");
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          openMessageModel(context);
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-          side: BorderSide(color: AppColors.kWhiteColor, width: 2),
-        ),
-
-        child: Icon(Icons.add, size: 40, color: AppColors.kWhiteColor),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          TodoTab(
-            incompletedTodos: inCompletedTodos,
-            completedTodos: completedTodos,
-          ),
-          CompletedTab(
-            completedTodos: completedTodos,
-            incompletedTodos: inCompletedTodos,
-          ),
-        ],
       ),
     );
   }

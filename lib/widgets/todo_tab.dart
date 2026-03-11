@@ -5,6 +5,7 @@ import 'package:note_sphere/services/todo_service.dart';
 import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/widgets/todo_card.dart';
+import 'package:note_sphere/widgets/todo_inherited_widget.dart';
 
 class TodoTab extends StatefulWidget {
   final List<Todo> incompletedTodos;
@@ -63,6 +64,7 @@ class _TodoTabState extends State<TodoTab> {
         widget.incompletedTodos.remove(todo);
       });
       AppHelpers.showSnackBar(context, "Todo Deleted");
+      AppRouter.router.go("/todos");
     } catch (e) {
       AppHelpers.showSnackBar(context, "Error deleting todo");
     }
@@ -80,6 +82,7 @@ class _TodoTabState extends State<TodoTab> {
         setState(() {}); // UI එක රිප්‍රෙෂ් කරනවා
         AppHelpers.showSnackBar(context, "Task updated successfully!");
         Navigator.of(context).pop();
+        AppRouter.router.go("/todos");
       }
     } catch (e) {
       AppHelpers.showSnackBar(context, "Error updating task");
@@ -136,59 +139,63 @@ class _TodoTabState extends State<TodoTab> {
   Widget build(BuildContext context) {
     widget.incompletedTodos.sort((a, b) => a.time.compareTo(b.time));
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.incompletedTodos.length,
-              itemBuilder: (context, index) {
-                final Todo todo = widget.incompletedTodos[index];
+    return TodoData(
+      todos: widget.incompletedTodos,
+      onTodosChanged: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.incompletedTodos.length,
+                itemBuilder: (context, index) {
+                  final Todo todo = widget.incompletedTodos[index];
 
-                return Dismissible(
-                  key: Key(todo.id.toString()),
+                  return Dismissible(
+                    key: Key(todo.id.toString()),
 
-                  // left to right edit (Edit - green color)
-                  background: Container(
-                    color: Colors.green,
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.edit, color: Colors.white),
-                  ),
+                    // left to right edit (Edit - green color)
+                    background: Container(
+                      color: Colors.green,
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
 
-                  // right to left swipe (Delete - red color)
-                  secondaryBackground: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
+                    // right to left swipe (Delete - red color)
+                    secondaryBackground: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
 
-                  // what is doing when swiped
-                  confirmDismiss: (direction) async {
-                    if (direction == DismissDirection.startToEnd) {
-                      // Edit logic
-                      openMessageModel(context, todo);
-                      return false; // මේක false කරාම ලිස්ට් එකෙන් අයිටම් එක අයින් වෙන්නේ නැහැ
-                    } else {
-                      // Delete ලොජික් එක
-                      _deleteTodo(todo);
-                      return true; // මේක true කරාම ලිස්ට් එකෙන් අයිටම් එක අයින් වෙනවා
-                    }
-                  },
+                    // what is doing when swiped
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        // Edit logic
+                        openMessageModel(context, todo);
+                        return false; // මේක false කරාම ලිස්ට් එකෙන් අයිටම් එක අයින් වෙන්නේ නැහැ
+                      } else {
+                        // Delete ලොජික් එක
+                        _deleteTodo(todo);
+                        return true; // මේක true කරාම ලිස්ට් එකෙන් අයිටම් එක අයින් වෙනවා
+                      }
+                    },
 
-                  child: TodoCard(
-                    todo: todo,
-                    isCompleted: false,
-                    onCheckBoxChanged: () => _markAsDone(todo),
-                  ),
-                );
-              },
+                    child: TodoCard(
+                      todo: todo,
+                      isCompleted: false,
+                      onCheckBoxChanged: () => _markAsDone(todo),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

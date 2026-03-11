@@ -6,6 +6,7 @@ import 'package:note_sphere/utils/colors.dart';
 import 'package:note_sphere/utils/router.dart';
 import 'package:note_sphere/utils/text_style.dart';
 import 'package:note_sphere/widgets/todo_card.dart';
+import 'package:note_sphere/widgets/todo_inherited_widget.dart';
 
 class CompletedTab extends StatefulWidget {
   final List<Todo> completedTodos;
@@ -63,6 +64,7 @@ class _CompletedTabState extends State<CompletedTab> {
         widget.completedTodos.remove(todo);
       });
       AppHelpers.showSnackBar(context, "Completed Todo Deleted");
+      AppRouter.router.go("/todos");
     } catch (e) {
       print(e.toString());
       AppHelpers.showSnackBar(context, "Error deleting todo");
@@ -95,6 +97,7 @@ class _CompletedTabState extends State<CompletedTab> {
         AppHelpers.showSnackBar(context, "Task updated successfully!");
         Navigator.of(context).pop();
         _taskController.clear();
+        AppRouter.router.go("/todos");
       }
     } catch (e) {
       AppHelpers.showSnackBar(context, "Error updating task");
@@ -154,68 +157,72 @@ class _CompletedTabState extends State<CompletedTab> {
   Widget build(BuildContext context) {
     widget.completedTodos.sort((a, b) => a.time.compareTo(b.time));
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.completedTodos.length,
-              itemBuilder: (context, index) {
-                final Todo todo = widget.completedTodos[index];
+    return TodoData(
+      todos: widget.completedTodos,
+      onTodosChanged: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.completedTodos.length,
+                itemBuilder: (context, index) {
+                  final Todo todo = widget.completedTodos[index];
 
-                return Dismissible(
-                  key: Key(todo.id.toString()),
+                  return Dismissible(
+                    key: Key(todo.id.toString()),
 
-                  // වමේ ඉඳන් දකුණට -> Edit (කොළ පාට)
-                  background: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(15),
+                    // වමේ ඉඳන් දකුණට -> Edit (කොළ පාට)
+                    background: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.edit, color: Colors.white),
                     ),
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.edit, color: Colors.white),
-                  ),
 
-                  // දකුණේ ඉඳන් වමට -> Delete (රතු පාට)
-                  secondaryBackground: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(15),
+                    // දකුණේ ඉඳන් වමට -> Delete (රතු පාට)
+                    secondaryBackground: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
 
-                  // Swipe කරනකොට ක්‍රියාත්මක වන ලොජික් එක
-                  confirmDismiss: (direction) async {
-                    if (direction == DismissDirection.startToEnd) {
-                      // Edit Dialog එක පෙන්වනවා
-                      openMessageModel(context, todo);
-                      return false; // ලිස්ට් එකෙන් අයින් වෙන්න දෙන්න එපා
-                    } else {
-                      // Delete කරනවා
-                      _deleteTodo(todo);
-                      return true; // ලිස්ට් එකෙන් අයින් වෙන්න දෙන්න
-                    }
-                  },
+                    // Swipe කරනකොට ක්‍රියාත්මක වන ලොජික් එක
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        // Edit Dialog එක පෙන්වනවා
+                        openMessageModel(context, todo);
+                        return false; // ලිස්ට් එකෙන් අයින් වෙන්න දෙන්න එපා
+                      } else {
+                        // Delete කරනවා
+                        _deleteTodo(todo);
+                        return true; // ලිස්ට් එකෙන් අයින් වෙන්න දෙන්න
+                      }
+                    },
 
-                  child: TodoCard(
-                    todo: todo,
-                    isCompleted: true,
-                    onCheckBoxChanged: () => _markAsUnDone(todo),
-                  ),
-                );
-              },
+                    child: TodoCard(
+                      todo: todo,
+                      isCompleted: true,
+                      onCheckBoxChanged: () => _markAsUnDone(todo),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
